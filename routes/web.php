@@ -190,6 +190,9 @@ Route::get('/test-session', function () {
     ]);
 });
 
+// Ruta de diagnóstico de dashboard
+Route::get('/test-dashboard', [App\Http\Controllers\SimpleDashboardController::class, 'index']);
+
 // Ruta de prueba para clientes
 Route::get('/test-customers', function () {
     try {
