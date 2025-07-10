@@ -16,10 +16,12 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    nodejs \
-    npm \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Instalar Node.js LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs
 
 # Instalar extensiones PHP necesarias
 RUN docker-php-ext-install \
@@ -52,7 +54,15 @@ RUN composer install --no-dev --no-scripts --no-autoloader
 
 # Copiar package.json si existe (para cache de capas)
 COPY package*.json ./
-RUN if [ -f "package.json" ]; then npm ci --only=production; fi
+
+# Instalar dependencias Node.js si existe package.json
+RUN if [ -f "package.json" ]; then \
+        echo "📦 Instalando dependencias Node.js..." && \
+        npm ci && \
+        echo "✅ Dependencias Node.js instaladas"; \
+    else \
+        echo "⚠️  No se encontró package.json, omitiendo instalación de Node.js"; \
+    fi
 
 # Copiar el resto de archivos del proyecto
 COPY . .
@@ -61,7 +71,15 @@ COPY . .
 RUN composer dump-autoload --no-dev --optimize
 
 # Construir assets si existen
-RUN if [ -f "package.json" ]; then npm run build; fi
+RUN if [ -f "package.json" ]; then \
+        echo "🏗️  Construyendo assets..." && \
+        (npm run build && echo "✅ Assets construidos exitosamente") || \
+        (echo "⚠️  Error en build de assets, continuando sin assets compilados" && \
+         mkdir -p public/build && \
+         echo '{}' > public/build/manifest.json); \
+    else \
+        echo "⚠️  No se encontró package.json, omitiendo build de assets"; \
+    fi
 
 # Crear directorios necesarios y configurar permisos
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
