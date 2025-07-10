@@ -42,8 +42,23 @@
     
     <title>La Que Va - Pizzería Online</title>
     
-    <!-- Vite -->
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom font configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sora': ['Sora', 'sans-serif'],
+                        'rubik-wet': ['Rubik Wet Paint', 'cursive'],
+                        'unbounded': ['Unbounded', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
     
     @stack('styles')
 </head>
