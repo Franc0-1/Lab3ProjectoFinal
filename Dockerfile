@@ -18,16 +18,37 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Configurar el directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiar los archivos del proyecto
-COPY . .
+# Copiar composer files primero para cache de Docker
+COPY composer.json composer.lock ./
 
 # Instalar las dependencias de PHP
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Copiar el resto de los archivos del proyecto
+COPY . .
+
+# Crear directorios necesarios y configurar permisos
+RUN mkdir -p /var/www/html/storage/logs \
+    && mkdir -p /var/www/html/storage/framework/cache \
+    && mkdir -p /var/www/html/storage/framework/sessions \
+    && mkdir -p /var/www/html/storage/framework/views \
+    && mkdir -p /var/www/html/bootstrap/cache
 
 # Configurar permisos
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
+
+# Crear archivo .env desde .env.example si no existe
+RUN cp .env.example .env || true
+
+# Generar APP_KEY
+RUN php artisan key:generate --force
+
+# Ejecutar comandos de Laravel
+RUN php artisan config:cache || true \
+    && php artisan route:cache || true \
+    && php artisan view:cache || true
 
 # Configurar Apache para Laravel
 RUN a2enmod rewrite
@@ -38,18 +59,12 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Script para configurar el puerto dinámicamente
-RUN echo '#!/bin/bash\n\
-set -e\n\
-PORT=${PORT:-80}\n\
-echo "Listen $PORT" > /etc/apache2/ports.conf\n\
-sed -i "s/*:80/*:$PORT/g" /etc/apache2/sites-available/000-default.conf\n\
-exec apache2-foreground' > /usr/local/bin/start-apache.sh
-
-RUN chmod +x /usr/local/bin/start-apache.sh
+# Copiar script de inicialización
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Exponer el puerto
 EXPOSE $PORT
 
 # Comando por defecto
-CMD ["/usr/local/bin/start-apache.sh"]
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
