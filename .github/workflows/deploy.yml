@@ -1,0 +1,159 @@
+name: 🍕 Deploy La Que Va Pizzería
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Permite ejecutar manualmente
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔄 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, pdo_mysql, tokenizer, xml, gd, redis
+        coverage: none
+        
+    - name: 📦 Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.composer/cache
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+        
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 📥 Install Composer dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+      
+    - name: 📥 Install NPM dependencies
+      run: npm ci --production
+      
+    - name: 🔨 Build assets
+      run: npm run build
+      
+    - name: 🧪 Run tests (optional)
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+        php artisan test --parallel
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: ":memory:"
+        
+    - name: 🚀 Deploy to server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd ${{ secrets.PROJECT_PATH }}
+          
+          echo "🍕 Iniciando deploy automático de La Que Va - Pizzería..."
+          
+          # Verificar que estamos en el directorio correcto
+          if [ ! -f "artisan" ]; then
+              echo "❌ Error: No se encontró artisan. Verificando directorio..."
+              pwd
+              ls -la
+              exit 1
+          fi
+          
+          # Activar modo de mantenimiento
+          echo "🔧 Activando modo de mantenimiento..."
+          php artisan down --retry=60 --secret="${{ secrets.MAINTENANCE_SECRET }}"
+          
+          # Backup de la base de datos
+          echo "💾 Creando backup de la base de datos..."
+          php artisan backup:run --only-db 2>/dev/null || echo "ℹ️  Backup saltado"
+          
+          # Obtener últimos cambios
+          echo "📥 Obteniendo últimos cambios..."
+          git fetch origin main
+          git reset --hard origin/main
+          
+          # Instalar dependencias de Composer
+          echo "📦 Instalando dependencias de PHP..."
+          composer install --no-dev --optimize-autoloader --no-interaction
+          
+          # Instalar dependencias de NPM
+          echo "📦 Instalando dependencias de Node.js..."
+          npm ci --production
+          
+          # Construir assets
+          echo "🔨 Construyendo assets..."
+          npm run build
+          
+          # Limpiar cachés
+          echo "🧹 Limpiando cachés..."
+          php artisan cache:clear
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+          
+          # Optimizar para producción
+          echo "⚡ Optimizando aplicación..."
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan event:cache
+          
+          # Ejecutar migraciones
+          echo "🗄️  Ejecutando migraciones..."
+          php artisan migrate --force
+          
+          # Generar rutas Ziggy
+          echo "🗺️  Generando rutas Ziggy..."
+          php artisan ziggy:generate
+          
+          # Verificar enlace de storage
+          echo "🔗 Verificando enlace de storage..."
+          php artisan storage:link
+          
+          # Ajustar permisos
+          echo "🔐 Ajustando permisos..."
+          chmod -R 755 storage bootstrap/cache
+          chmod -R 775 storage/logs storage/framework storage/app
+          
+          # Reiniciar servicios (opcional)
+          echo "🔄 Reiniciando servicios..."
+          sudo systemctl reload php8.1-fpm 2>/dev/null || echo "ℹ️  PHP-FPM no reiniciado"
+          sudo systemctl reload nginx 2>/dev/null || echo "ℹ️  Nginx no reiniciado"
+          
+          # Desactivar modo de mantenimiento
+          echo "✅ Desactivando modo de mantenimiento..."
+          php artisan up
+          
+          echo ""
+          echo "🎉 ¡Deploy completado exitosamente!"
+          echo "🍕 La Que Va - Pizzería está lista para servir!"
+          echo ""
+          
+          # Verificar estado
+          echo "📊 Verificando estado de la aplicación..."
+          php artisan about --only=environment
+          
+          echo "✅ Deploy automático completado: $(date)"
+
+    - name: 🔔 Notify deployment success
+      if: success()
+      run: |
+        echo "🎉 ¡Deploy exitoso! La Que Va está lista para servir pizzas 🍕"
+        
+    - name: 🚨 Notify deployment failure
+      if: failure()
+      run: |
+        echo "❌ Deploy falló. Revisa los logs para más información."
