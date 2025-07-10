@@ -62,16 +62,10 @@ COPY package*.json ./
 # Copiar el resto de archivos del proyecto
 COPY . .
 
-# Instalar dependencias PHP (sin scripts primero)
-RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --no-scripts
+# Instalar dependencias PHP completamente sin scripts
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --no-scripts --no-autoloader
 
-# Usar archivo .env temporal para el build
-RUN cp .env.docker .env
-
-# Generar clave de aplicación
-RUN php artisan key:generate --force --no-interaction
-
-# Ejecutar dump-autoload
+# Generar autoloader manualmente
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --optimize --no-scripts
 
 # Instalar dependencias de Node.js y construir assets
