@@ -78,6 +78,11 @@ RUN if [ -f "package.json" ]; then \
         ls -la public/build && \
         echo "📁 Contenido del directorio build:" && \
         ls -la public/build/assets/ | head -10 && \
+        echo "🔄 Copiando manifest.json a la ubicación correcta..." && \
+        if [ -f "public/build/.vite/manifest.json" ]; then \
+            cp public/build/.vite/manifest.json public/build/manifest.json && \
+            echo "✅ Manifest copiado exitosamente"; \
+        fi && \
         echo "📄 Verificando manifest.json:" && \
         cat public/build/manifest.json | head -5; \
     else \
