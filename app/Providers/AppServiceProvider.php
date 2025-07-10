@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Configure trusted proxies for production
         if (config('app.env') === 'production') {
-            Request::setTrustedProxies(['*'], Request::HEADER_X_FORWARDED_ALL);
+            Request::setTrustedProxies(['*'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
         }
 
         // Force HTTPS in production
