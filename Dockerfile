@@ -56,14 +56,15 @@ COPY .htaccess /var/www/html/public/.htaccess
 
 # Configurar Apache para usar el puerto de la variable de entorno
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Configuración detallada de logging para debugging
-RUN echo 'LogLevel debug' >> /etc/apache2/apache2.conf
+# Habilitar módulos necesarios de Apache
+RUN a2enmod rewrite headers
 
 # Copiar archivo de configuración de Apache
 COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+
+# Configurar Apache para usar solo el puerto dinámico
+RUN echo 'Listen ${PORT}' > /etc/apache2/ports.conf
 
 # Copiar script de inicialización
 COPY docker-entrypoint.sh /usr/local/bin/

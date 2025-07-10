@@ -4,10 +4,17 @@ set -e
 echo "=== Iniciando configuración de Laravel ==="
 
 # Configurar el puerto para Apache
-PORT=${PORT:-80}
+PORT=${PORT:-10000}
 echo "Configurando Apache en puerto: $PORT"
+
+# Configurar ports.conf
 echo "Listen $PORT" > /etc/apache2/ports.conf
-sed -i "s/*:80/*:$PORT/g" /etc/apache2/sites-available/000-default.conf
+
+# Configurar el VirtualHost con el puerto correcto
+sed -i "s/\${PORT}/$PORT/g" /etc/apache2/sites-available/000-default.conf
+
+# Asegurar que Apache no escuche en el puerto 80
+sed -i '/Listen 80/d' /etc/apache2/ports.conf
 
 # Configurar variables de entorno de Laravel
 export APP_ENV=${APP_ENV:-production}
