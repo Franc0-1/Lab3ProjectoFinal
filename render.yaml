@@ -23,6 +23,22 @@ services:
         value: "La Queva Pizzería"
       - key: APP_FORCE_HTTPS
         value: "true"
-    # Descomentar y configurar si usas base de datos
-    # - key: DATABASE_URL
-    #   value: your_database_url_here
+      # Configuración PostgreSQL
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: dpg-d1nue22dbo4c73f346eg-a.oregon-postgres.render.com
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        value: postgre_laqueva
+      - key: DB_USERNAME
+        value: postgre_laqueva_user
+      - key: DB_PASSWORD
+        value: 76dEXldIGg8FCCMDX6iJxR6mtsdLOOe6
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database

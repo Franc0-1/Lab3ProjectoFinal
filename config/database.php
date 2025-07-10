@@ -62,6 +62,25 @@ return [
             ]) : [],
         ],
 
+        'mysql_source' => [
+            'driver' => 'mysql',
+            'host' => env('MYSQL_SOURCE_HOST', '127.0.0.1'),
+            'port' => env('MYSQL_SOURCE_PORT', '3306'),
+            'database' => env('MYSQL_SOURCE_DATABASE', 'laqueva_pizzeria'),
+            'username' => env('MYSQL_SOURCE_USERNAME', 'root'),
+            'password' => env('MYSQL_SOURCE_PASSWORD', ''),
+            'unix_socket' => env('MYSQL_SOURCE_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

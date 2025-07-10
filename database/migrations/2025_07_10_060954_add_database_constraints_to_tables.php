@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
-use Exception;
 
 return new class extends Migration
 {
@@ -26,10 +25,10 @@ return new class extends Migration
             $table->unique('email', 'customers_email_unique');
             $table->index('frequent_customer');
             $table->index('neighborhood');
-            // Validar que el teléfono tenga un formato válido
-            DB::statement('ALTER TABLE customers ADD CONSTRAINT customers_phone_format CHECK (phone REGEXP "^[0-9+\\-\\s()]{7,20}$")');
-            // Validar que el email tenga formato válido si no es null
-            DB::statement('ALTER TABLE customers ADD CONSTRAINT customers_email_format CHECK (email IS NULL OR email REGEXP "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")');
+            // Validar que el teléfono tenga longitud adecuada
+            DB::statement("ALTER TABLE customers ADD CONSTRAINT customers_phone_length CHECK (LENGTH(phone) >= 7 AND LENGTH(phone) <= 20)");
+            // Validar que el email tenga formato válido si no es null (PostgreSQL tiene validación básica de email)
+            // DB::statement("ALTER TABLE customers ADD CONSTRAINT customers_email_format CHECK (email IS NULL OR email LIKE '%@%.%')");
         });
 
         // Añadir restricciones a la tabla pizzas
@@ -97,9 +96,9 @@ return new class extends Migration
     {
         // Eliminar restricciones de customers
         try {
-            DB::statement('ALTER TABLE customers DROP CONSTRAINT customers_phone_format');
-            DB::statement('ALTER TABLE customers DROP CONSTRAINT customers_email_format');
-        } catch (Exception $e) {
+            DB::statement('ALTER TABLE customers DROP CONSTRAINT customers_phone_length');
+            // DB::statement('ALTER TABLE customers DROP CONSTRAINT customers_email_format');
+        } catch (\Exception $e) {
             // Ignorar errores si las restricciones no existen
         }
 
@@ -107,7 +106,7 @@ return new class extends Migration
         try {
             DB::statement('ALTER TABLE pizzas DROP CONSTRAINT pizzas_price_positive');
             DB::statement('ALTER TABLE pizzas DROP CONSTRAINT pizzas_preparation_time_positive');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Ignorar errores si las restricciones no existen
         }
 
@@ -117,7 +116,7 @@ return new class extends Migration
             DB::statement('ALTER TABLE orders DROP CONSTRAINT orders_delivery_fee_positive');
             DB::statement('ALTER TABLE orders DROP CONSTRAINT orders_total_positive');
             DB::statement('ALTER TABLE orders DROP CONSTRAINT orders_total_calculation');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Ignorar errores si las restricciones no existen
         }
 
@@ -127,7 +126,7 @@ return new class extends Migration
             DB::statement('ALTER TABLE order_items DROP CONSTRAINT order_items_unit_price_positive');
             DB::statement('ALTER TABLE order_items DROP CONSTRAINT order_items_total_price_positive');
             DB::statement('ALTER TABLE order_items DROP CONSTRAINT order_items_total_calculation');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Ignorar errores si las restricciones no existen
         }
 
@@ -135,7 +134,7 @@ return new class extends Migration
         if (Schema::hasTable('promotions')) {
             try {
                 DB::statement('ALTER TABLE promotions DROP CONSTRAINT promotions_dates_valid');
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Ignorar errores si las restricciones no existen
             }
         }

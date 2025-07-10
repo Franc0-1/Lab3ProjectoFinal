@@ -41,9 +41,8 @@ if ! grep -q "APP_KEY=base64:" .env; then
 fi
 
 # Ejecutar migraciones si están configuradas
-# Descomenta la siguiente línea si usas base de datos
-# echo "🗄️  Ejecutando migraciones..."
-# php artisan migrate --force --no-interaction
+echo "🗄️  Ejecutando migraciones..."
+php artisan migrate --force --no-interaction
 
 # Optimizar para producción
 echo "⚡ Optimizando aplicación..."
