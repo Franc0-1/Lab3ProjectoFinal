@@ -19,9 +19,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Node.js LTS
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
-    && apt-get install -y nodejs
+# Node.js no necesario - usando Tailwind CDN
+# RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+#     && apt-get install -y nodejs
 
 # Instalar extensiones PHP necesarias
 RUN docker-php-ext-install \
@@ -52,17 +52,8 @@ COPY composer.json composer.lock ./
 # Instalar dependencias PHP
 RUN composer install --no-dev --no-scripts --no-autoloader
 
-# Copiar package.json si existe (para cache de capas)
-COPY package*.json ./
-
-# Instalar dependencias Node.js si existe package.json
-RUN if [ -f "package.json" ]; then \
-        echo "📦 Instalando dependencias Node.js..." && \
-        npm ci --include=dev && \
-        echo "✅ Dependencias Node.js instaladas"; \
-    else \
-        echo "⚠️  No se encontró package.json, omitiendo instalación de Node.js"; \
-    fi
+# Omitir instalación de Node.js - usando Tailwind CDN
+# COPY package*.json ./
 
 # Copiar el resto de archivos del proyecto
 COPY . .
@@ -70,38 +61,8 @@ COPY . .
 # Finalizar instalación de Composer
 RUN composer dump-autoload --no-dev --optimize
 
-# Construir assets si existen
-RUN if [ -f "package.json" ]; then \
-        echo "🏗️  Construyendo assets..." && \
-        echo "🧹 Limpiando cache de npm..." && \
-        npm cache clean --force && \
-        echo "🚀 Ejecutando build..." && \
-        NODE_ENV=production npm run build && \
-        echo "✅ Assets construidos exitosamente" && \
-        ls -la public/build && \
-        echo "📁 Contenido del directorio build:" && \
-        ls -la public/build/assets/ | head -10 && \
-        echo "🔄 Verificando manifest.json..." && \
-        if [ -f "public/build/.vite/manifest.json" ]; then \
-            cp public/build/.vite/manifest.json public/build/manifest.json && \
-            echo "✅ Manifest copiado exitosamente"; \
-        fi && \
-        if [ -f "public/build/manifest.json" ]; then \
-            echo "📄 Manifest.json existe y contiene:" && \
-            cat public/build/manifest.json | head -10; \
-        else \
-            echo "❌ ERROR: No se encontró manifest.json"; \
-        fi; \
-    else \
-        echo "⚠️  No se encontró package.json, omitiendo build de assets"; \
-    fi
-
-# Limpiar dependencias de Node.js después del build (opcional para reducir tamaño)
-RUN if [ -f "package.json" ]; then \
-        echo "🧼 Limpiando dependencias de desarrollo..." && \
-        npm ci --production && \
-        echo "✅ Dependencias de desarrollo eliminadas"; \
-    fi
+# Assets se manejan via CDN, no necesitamos build
+RUN echo "📦 Usando Tailwind CDN, omitiendo build de assets"
 
 # Crear directorios necesarios y configurar permisos
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
