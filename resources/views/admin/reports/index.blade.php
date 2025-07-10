@@ -82,7 +82,7 @@
             </div>
         </div>
         <div class="flex space-x-3">
-            <a href="{{ route('reports.pizzas.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors opacity-50 cursor-not-allowed" title="Temporalmente deshabilitado">
+            <a href="{{ route('reports.pizzas.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors">
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
@@ -110,7 +110,7 @@
             </div>
         </div>
         <div class="flex space-x-3">
-            <a href="{{ route('reports.customers.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors opacity-50 cursor-not-allowed" title="Temporalmente deshabilitado">
+            <a href="{{ route('reports.customers.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors">
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
@@ -141,7 +141,7 @@
             </div>
         </div>
         <div class="flex space-x-3">
-            <a href="{{ route('reports.orders.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors opacity-50 cursor-not-allowed" title="Temporalmente deshabilitado">
+            <a href="{{ route('reports.orders.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors">
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
@@ -194,7 +194,7 @@
             </div>
         </div>
         <div class="flex space-x-3">
-            <a href="{{ route('reports.categories.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors opacity-50 cursor-not-allowed" title="Temporalmente deshabilitado">
+            <a href="{{ route('reports.categories.excel') }}" class="flex-1 bg-green-600 text-white text-center py-2 px-4 rounded hover:bg-green-700 transition-colors">
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
@@ -259,14 +259,14 @@
     <h3 class="text-lg font-semibold text-gray-700 mb-4">Información de Reportes</h3>
     
     <!-- Aviso sobre Excel -->
-    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
         <div class="flex items-center">
-            <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <h4 class="font-medium text-yellow-800">Exportación de Excel Temporalmente Deshabilitada</h4>
+            <h4 class="font-medium text-green-800">Exportaciones de Excel Habilitadas</h4>
         </div>
-        <p class="text-yellow-700 text-sm mt-2">Debido a problemas de compatibilidad, la exportación a Excel está temporalmente deshabilitada. Utiliza los reportes en PDF que incluyen toda la información necesaria con un formato profesional.</p>
+        <p class="text-green-700 text-sm mt-2">Las exportaciones a Excel (formato CSV compatible) ya están completamente funcionales. Los archivos se descargan con codificación UTF-8 y pueden abrirse directamente en Excel o LibreOffice.</p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
