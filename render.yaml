@@ -13,6 +13,12 @@ services:
         value: base64:bm32SsL5Fqi9rkMHrgniBygvZa8eEBnYU5NlGtcxVxU=
       - key: LOG_CHANNEL
         value: stderr
+      - key: ASSET_URL
+        sync: false
+      - key: MIX_ASSET_URL
+        sync: false
+      - key: VITE_APP_NAME
+        value: "La Queva Pizzería"
     # Descomentar y configurar si usas base de datos
     # - key: DATABASE_URL
     #   value: your_database_url_here
