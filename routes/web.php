@@ -62,25 +62,9 @@ Route::prefix('cart')->name('cart.')->group(function () {
         return view('test-cart-buttons');
     })->name('test');
     
-    Route::get('/test-routes', function () {
-        return response()->json([
-            'available_routes' => [
-                'GET /cart' => 'cart.index',
-                'POST /cart/add' => 'cart.add',
-                'PATCH /cart/update/{id}' => 'cart.update',
-                'DELETE /cart/remove/{id}' => 'cart.remove',
-                'DELETE /cart/delete/{id}' => 'cart.delete',
-                'DELETE /cart/clear' => 'cart.clear',
-                'GET /cart/count' => 'cart.count',
-                'GET /cart/debug' => 'cart.debug',
-            ],
-            'session_info' => [
-                'session_id' => session()->getId(),
-                'cart' => session('cart', []),
-                'csrf_token' => csrf_token()
-            ]
-        ]);
-    })->name('test-routes');
+    Route::get('/test-csrf-cart', function () {
+        return view('test-csrf-cart');
+    });
 });
 
 // Rutas de Inertia (mantenemos las originales)
@@ -171,6 +155,38 @@ Route::get('/test-csrf', function () {
         'session_id' => session()->getId(),
         'session_token' => session()->token(),
         'meta_token' => csrf_token()
+    ]);
+});
+
+// Ruta de prueba POST para CSRF
+Route::post('/test-csrf-post', function (Request $request) {
+    return response()->json([
+        'success' => true,
+        'message' => 'CSRF validation passed',
+        'received_data' => $request->all(),
+        'csrf_token' => csrf_token()
+    ]);
+});
+
+// Ruta de diagnóstico de sesiones
+Route::get('/test-session', function () {
+    // Crear una sesión de prueba
+    session(['test_key' => 'test_value']);
+    session()->save();
+    
+    // Verificar que se guardó
+    $sessionData = DB::table('sessions')
+        ->where('id', session()->getId())
+        ->first();
+    
+    return response()->json([
+        'session_id' => session()->getId(),
+        'session_driver' => config('session.driver'),
+        'session_table_exists' => Schema::hasTable('sessions'),
+        'session_in_db' => $sessionData ? true : false,
+        'session_data' => session()->all(),
+        'csrf_token' => csrf_token(),
+        'db_session_count' => DB::table('sessions')->count()
     ]);
 });
 
