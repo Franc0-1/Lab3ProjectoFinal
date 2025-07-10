@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.static')
 @section('title', 'Bienvenido')
 @section('content')
 

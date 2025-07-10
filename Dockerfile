@@ -73,18 +73,25 @@ RUN composer dump-autoload --no-dev --optimize
 # Construir assets si existen
 RUN if [ -f "package.json" ]; then \
         echo "🏗️  Construyendo assets..." && \
-        npm run build && \
+        echo "🧹 Limpiando cache de npm..." && \
+        npm cache clean --force && \
+        echo "🚀 Ejecutando build..." && \
+        NODE_ENV=production npm run build && \
         echo "✅ Assets construidos exitosamente" && \
         ls -la public/build && \
         echo "📁 Contenido del directorio build:" && \
         ls -la public/build/assets/ | head -10 && \
-        echo "🔄 Copiando manifest.json a la ubicación correcta..." && \
+        echo "🔄 Verificando manifest.json..." && \
         if [ -f "public/build/.vite/manifest.json" ]; then \
             cp public/build/.vite/manifest.json public/build/manifest.json && \
             echo "✅ Manifest copiado exitosamente"; \
         fi && \
-        echo "📄 Verificando manifest.json:" && \
-        cat public/build/manifest.json | head -5; \
+        if [ -f "public/build/manifest.json" ]; then \
+            echo "📄 Manifest.json existe y contiene:" && \
+            cat public/build/manifest.json | head -10; \
+        else \
+            echo "❌ ERROR: No se encontró manifest.json"; \
+        fi; \
     else \
         echo "⚠️  No se encontró package.json, omitiendo build de assets"; \
     fi

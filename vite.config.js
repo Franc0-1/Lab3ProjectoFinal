@@ -17,10 +17,21 @@ export default defineConfig({
         outDir: 'public/build',
         emptyOutDir: true,
         manifest: true,
+        assetsDir: 'assets',
         rollupOptions: {
             output: {
                 manualChunks: undefined,
             },
+        },
+    },
+    server: {
+        hmr: {
+            host: 'localhost',
+        },
+    },
+    resolve: {
+        alias: {
+            '@': '/resources/js',
         },
     },
 });
