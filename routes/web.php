@@ -12,9 +12,28 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+// Ruta de diagnóstico simple
+Route::get('/test-simple', function () {
+    return response()->json([
+        'status' => 'OK',
+        'timestamp' => now(),
+        'environment' => config('app.env'),
+        'debug' => config('app.debug')
+    ]);
+});
+
 // Ruta principal
 Route::get('/', function () {
-    return view('home');
+    try {
+        return view('home');
+    } catch (Exception $e) {
+        return response()->json([
+            'error' => 'Error loading home view',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
 })->name('welcome');
 
 // Ruta alternativa para welcome
