@@ -61,16 +61,9 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 # Configuración detallada de logging para debugging
 RUN echo 'LogLevel debug' >> /etc/apache2/apache2.conf
-RUN echo -e '<VirtualHost *:80>\n\
-    DocumentRoot /var/www/html/public\n\
-    <Directory /var/www/html>\n\
-        Options Indexes FollowSymLinks\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
-    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
+# Copiar archivo de configuración de Apache
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Copiar script de inicialización
 COPY docker-entrypoint.sh /usr/local/bin/
