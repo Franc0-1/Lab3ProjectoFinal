@@ -33,8 +33,23 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN a2enmod rewrite
 COPY .htaccess /var/www/html/public/.htaccess
 
+# Configurar Apache para usar el puerto de la variable de entorno
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Script para configurar el puerto dinámicamente
+RUN echo '#!/bin/bash\n\
+set -e\n\
+PORT=${PORT:-80}\n\
+echo "Listen $PORT" > /etc/apache2/ports.conf\n\
+sed -i "s/*:80/*:$PORT/g" /etc/apache2/sites-available/000-default.conf\n\
+exec apache2-foreground' > /usr/local/bin/start-apache.sh
+
+RUN chmod +x /usr/local/bin/start-apache.sh
+
 # Exponer el puerto
-EXPOSE 80
+EXPOSE $PORT
 
 # Comando por defecto
-CMD ["apache2-foreground"]
+CMD ["/usr/local/bin/start-apache.sh"]
