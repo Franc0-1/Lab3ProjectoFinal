@@ -8,6 +8,14 @@ composer install --no-dev --optimize-autoloader
 # Generar clave de aplicación si no existe
 php artisan key:generate --ansi --no-interaction
 
+# Ejecutar migraciones
+echo "🗄️  Ejecutando migraciones..."
+php artisan migrate --force --no-interaction
+
+# Crear enlace simbólico para storage
+echo "🔗 Creando enlace de storage..."
+php artisan storage:link
+
 # Optimizar configuraciones para producción
 php artisan config:cache
 php artisan route:cache

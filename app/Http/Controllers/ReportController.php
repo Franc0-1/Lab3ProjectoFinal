@@ -65,16 +65,16 @@ class ReportController extends Controller
     public function exportCategoriesExcel(ExcelExportService $exportService)
     {
         try {
-            $categories = Category::with('pizzas')-\u003eget();
-            $formattedData = $exportService-\u003eformatCategoriesData($categories);
+            $categories = Category::with('pizzas')->get();
+            $formattedData = $exportService->formatCategoriesData($categories);
             
-            return $exportService-\u003eexportToCsv(
+            return $exportService->exportToCsv(
                 collect($formattedData['data']),
                 $formattedData['headers'],
                 'categorias_' . date('Y-m-d') . '.csv'
             );
         } catch (\Exception $e) {
-            return response()-\u003ejson(['error' =\\\u003e 'Error al generar archivo Excel: ' . $e-\u003egetMessage()], 500);
+            return response()->json(['error' => 'Error al generar archivo Excel: ' . $e->getMessage()], 500);
         }
     }
 
