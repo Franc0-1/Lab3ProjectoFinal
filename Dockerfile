@@ -58,7 +58,7 @@ COPY package*.json ./
 # Instalar dependencias Node.js si existe package.json
 RUN if [ -f "package.json" ]; then \
         echo "📦 Instalando dependencias Node.js..." && \
-        npm ci && \
+        npm ci --include=dev && \
         echo "✅ Dependencias Node.js instaladas"; \
     else \
         echo "⚠️  No se encontró package.json, omitiendo instalación de Node.js"; \
@@ -73,12 +73,22 @@ RUN composer dump-autoload --no-dev --optimize
 # Construir assets si existen
 RUN if [ -f "package.json" ]; then \
         echo "🏗️  Construyendo assets..." && \
-        (npm run build && echo "✅ Assets construidos exitosamente") || \
-        (echo "⚠️  Error en build de assets, continuando sin assets compilados" && \
-         mkdir -p public/build && \
-         echo '{}' > public/build/manifest.json); \
+        npm run build && \
+        echo "✅ Assets construidos exitosamente" && \
+        ls -la public/build && \
+        echo "📁 Contenido del directorio build:" && \
+        ls -la public/build/assets/ | head -10 && \
+        echo "📄 Verificando manifest.json:" && \
+        cat public/build/manifest.json | head -5; \
     else \
         echo "⚠️  No se encontró package.json, omitiendo build de assets"; \
+    fi
+
+# Limpiar dependencias de Node.js después del build (opcional para reducir tamaño)
+RUN if [ -f "package.json" ]; then \
+        echo "🧼 Limpiando dependencias de desarrollo..." && \
+        npm ci --production && \
+        echo "✅ Dependencias de desarrollo eliminadas"; \
     fi
 
 # Crear directorios necesarios y configurar permisos
