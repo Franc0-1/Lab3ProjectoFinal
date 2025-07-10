@@ -19,9 +19,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Node.js no necesario - usando Tailwind CDN
-# RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
-#     && apt-get install -y nodejs
+# Instalar Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs
 
 # Instalar extensiones PHP necesarias
 RUN docker-php-ext-install \
@@ -39,9 +39,12 @@ RUN docker-php-ext-install \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configurar Apache
-RUN a2enmod rewrite
+RUN a2enmod rewrite headers expires
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Copiar configuración SSL personalizada
+COPY apache-ssl.conf /etc/apache2/sites-available/000-default.conf
 
 # Establecer directorio de trabajo
 WORKDIR /var/www/html
@@ -52,8 +55,8 @@ COPY composer.json composer.lock ./
 # Instalar dependencias PHP
 RUN composer install --no-dev --no-scripts --no-autoloader
 
-# Omitir instalación de Node.js - usando Tailwind CDN
-# COPY package*.json ./
+# Copiar package.json y package-lock.json
+COPY package*.json ./
 
 # Copiar el resto de archivos del proyecto
 COPY . .
@@ -61,8 +64,9 @@ COPY . .
 # Finalizar instalación de Composer
 RUN composer dump-autoload --no-dev --optimize
 
-# Assets se manejan via CDN, no necesitamos build
-RUN echo "📦 Usando Tailwind CDN, omitiendo build de assets"
+# Instalar dependencias de Node.js y construir assets
+RUN npm install
+RUN npm run build
 
 # Crear directorios necesarios y configurar permisos
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \

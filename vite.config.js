@@ -36,4 +36,6 @@ export default defineConfig({
             '@': '/resources/js',
         },
     },
+    // Configuración para producción
+    base: process.env.NODE_ENV === 'production' ? '/build/' : '/',
 });

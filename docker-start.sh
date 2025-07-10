@@ -40,6 +40,10 @@ if ! grep -q "APP_KEY=base64:" .env; then
     php artisan key:generate --no-interaction --force
 fi
 
+# Crear enlace de almacenamiento
+echo "🔗 Creando enlace de almacenamiento..."
+php artisan storage:link --no-interaction
+
 # Ejecutar migraciones si están configuradas
 echo "🗄️  Ejecutando migraciones..."
 php artisan migrate --force --no-interaction
