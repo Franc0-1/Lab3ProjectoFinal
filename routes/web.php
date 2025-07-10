@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HealthController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -21,6 +22,9 @@ Route::get('/test-simple', function () {
         'debug' => config('app.debug')
     ]);
 });
+
+// Health Check
+Route::get('/health', [HealthController::class, 'check'])->name('health.check');
 
 // Ruta principal
 Route::get('/', function () {
