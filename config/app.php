@@ -123,4 +123,28 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Force HTTPS
+    |--------------------------------------------------------------------------
+    |
+    | This option controls whether to force HTTPS URLs for all generated links.
+    | Useful for production environments behind SSL proxies like Render.
+    |
+    */
+
+    'force_https' => env('APP_FORCE_HTTPS', env('APP_ENV') === 'production'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Asset URL
+    |--------------------------------------------------------------------------
+    |
+    | This URL is used to properly generate URLs for your assets when using
+    | a CDN or when your assets are served from a different domain.
+    |
+    */
+
+    'asset_url' => env('ASSET_URL'),
+
 ];

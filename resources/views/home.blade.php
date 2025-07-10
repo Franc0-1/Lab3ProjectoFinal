@@ -6,7 +6,7 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center">
-                <img src="/assets/logo.svg" alt="LaQueva" class="h-8 w-auto">
+                <img src="{{ asset('assets/logo.svg') }}" alt="LaQueva" class="h-8 w-auto">
                 <span class="ml-2 text-lg font-bold text-gray-800 hidden sm:block">LaQueva</span>
             </div>
             <div class="flex items-center space-x-2 sm:space-x-4">
@@ -63,7 +63,7 @@
     <!-- Primera sección - Logo -->
     <section class="min-h-screen flex flex-col justify-start md:justify-center pt-24 items-center">
         <div id="logo-container" class="mb-8">
-            <img src="/assets/logo.svg" alt="La Que Va Logo" style="width: 200px; height: auto;" class="logo-animated">
+            <img src="{{ asset('assets/logo.svg') }}" alt="La Que Va Logo" style="width: 200px; height: auto;" class="logo-animated">
         </div>
         
         <div class="text-center">
@@ -129,7 +129,7 @@
                                     <div class="w-full rounded-xl overflow-hidden shadow-lg flex flex-col bg-red-500">
                                         <div class="flex w-full flex-1 p-2">
                                             <div class="w-1/4 items-center justify-center flex rounded-lg">
-                                                <img src="/assets/{{ $pizza['imagen'] }}" 
+                                                <img src="{{ asset('assets/' . $pizza['imagen']) }}"
                                                      alt="Pizza {{ $pizza['nombre'] }}" 
                                                      class="w-16 h-16 sm:w-28 sm:h-28 rounded-lg object-cover">
                                             </div>
@@ -271,7 +271,7 @@
         <div class="flex flex-col items-center w-full">
             <div class="flex-col mb-8 mx-8">
                 <a href="http://tinystudioar.com" target="_blank" class="block mx-auto">
-                    <img src="/assets/tiny2.svg" alt="Tiny Studio" class="w-64 sm:w-100 h-auto">
+                    <img src="{{ asset('assets/tiny2.svg') }}" alt="Tiny Studio" class="w-64 sm:w-100 h-auto">
                 </a>
             </div>
             <div class="flex-col text-center p-2">

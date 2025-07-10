@@ -26,7 +26,9 @@ export default defineConfig({
     },
     server: {
         hmr: {
-            host: 'localhost',
+            protocol: 'wss',
+            host: 'laquevapizza.onrender.com',
+            clientPort: 443,
         },
     },
     resolve: {

@@ -11,14 +11,18 @@ services:
         value: "false"
       - key: APP_KEY
         value: base64:bm32SsL5Fqi9rkMHrgniBygvZa8eEBnYU5NlGtcxVxU=
+      - key: APP_URL
+        value: https://laquevapizza.onrender.com
       - key: LOG_CHANNEL
         value: stderr
       - key: ASSET_URL
-        sync: false
+        value: https://laquevapizza.onrender.com
       - key: MIX_ASSET_URL
-        sync: false
+        value: https://laquevapizza.onrender.com
       - key: VITE_APP_NAME
         value: "La Queva Pizzería"
+      - key: APP_FORCE_HTTPS
+        value: "true"
     # Descomentar y configurar si usas base de datos
     # - key: DATABASE_URL
     #   value: your_database_url_here
