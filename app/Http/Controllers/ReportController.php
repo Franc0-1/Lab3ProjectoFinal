@@ -3,12 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-// Temporalmente comentado debido a problemas de compatibilidad
-// use Maatwebsite\Excel\Facades\Excel;
-// use App\Exports\PizzaExport;
-// use App\Exports\CustomerExport;
-// use App\Exports\CategoryExport;
-// use App\Exports\OrderExport;
+use App\Services\ExcelExportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Pizza;
 use App\Models\Customer;
@@ -19,11 +14,20 @@ use Inertia\Inertia;
 class ReportController extends Controller
 {
     // Reportes de Pizzas
-    public function exportPizzasExcel()
+    public function exportPizzasExcel(ExcelExportService $exportService)
     {
-        // Temporalmente deshabilitado debido a problemas de compatibilidad
-        return response()->json(['error' => 'Exportación de Excel temporalmente deshabilitada'], 503);
-        // return Excel::download(new PizzaExport, 'pizzas_' . date('Y-m-d') . '.xlsx');
+        try {
+            $pizzas = Pizza::with('category')->get();
+            $formattedData = $exportService->formatPizzasData($pizzas);
+            
+            return $exportService->exportToCsv(
+                collect($formattedData['data']),
+                $formattedData['headers'],
+                'pizzas_' . date('Y-m-d') . '.csv'
+            );
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al generar archivo Excel: ' . $e->getMessage()], 500);
+        }
     }
 
     public function exportPizzasPdf()
@@ -34,11 +38,20 @@ class ReportController extends Controller
     }
 
     // Reportes de Clientes
-    public function exportCustomersExcel()
+    public function exportCustomersExcel(ExcelExportService $exportService)
     {
-        // Temporalmente deshabilitado debido a problemas de compatibilidad
-        return response()->json(['error' => 'Exportación de Excel temporalmente deshabilitada'], 503);
-        // return Excel::download(new CustomerExport, 'clientes_' . date('Y-m-d') . '.xlsx');
+        try {
+            $customers = Customer::with('orders')->get();
+            $formattedData = $exportService->formatCustomersData($customers);
+            
+            return $exportService->exportToCsv(
+                collect($formattedData['data']),
+                $formattedData['headers'],
+                'clientes_' . date('Y-m-d') . '.csv'
+            );
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al generar archivo Excel: ' . $e->getMessage()], 500);
+        }
     }
 
     public function exportCustomersPdf()
@@ -49,11 +62,20 @@ class ReportController extends Controller
     }
 
     // Reportes de Categorías
-    public function exportCategoriesExcel()
+    public function exportCategoriesExcel(ExcelExportService $exportService)
     {
-        // Temporalmente deshabilitado debido a problemas de compatibilidad
-        return response()->json(['error' => 'Exportación de Excel temporalmente deshabilitada'], 503);
-        // return Excel::download(new CategoryExport, 'categorias_' . date('Y-m-d') . '.xlsx');
+        try {
+            $categories = Category::with('pizzas')-\u003eget();
+            $formattedData = $exportService-\u003eformatCategoriesData($categories);
+            
+            return $exportService-\u003eexportToCsv(
+                collect($formattedData['data']),
+                $formattedData['headers'],
+                'categorias_' . date('Y-m-d') . '.csv'
+            );
+        } catch (\Exception $e) {
+            return response()-\u003ejson(['error' =\\\u003e 'Error al generar archivo Excel: ' . $e-\u003egetMessage()], 500);
+        }
     }
 
     public function exportCategoriesPdf()
@@ -64,11 +86,20 @@ class ReportController extends Controller
     }
 
     // Reportes de Órdenes
-    public function exportOrdersExcel()
+    public function exportOrdersExcel(ExcelExportService $exportService)
     {
-        // Temporalmente deshabilitado debido a problemas de compatibilidad
-        return response()->json(['error' => 'Exportación de Excel temporalmente deshabilitada'], 503);
-        // return Excel::download(new OrderExport, 'ordenes_' . date('Y-m-d') . '.xlsx');
+        try {
+            $orders = Order::with('customer', 'items.pizza')->get();
+            $formattedData = $exportService->formatOrdersData($orders);
+            
+            return $exportService->exportToCsv(
+                collect($formattedData['data']),
+                $formattedData['headers'],
+                'ordenes_' . date('Y-m-d') . '.csv'
+            );
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al generar archivo Excel: ' . $e->getMessage()], 500);
+        }
     }
 
     public function exportOrdersPdf()
@@ -160,11 +191,9 @@ class ReportController extends Controller
     }
 
     // Métodos legacy para compatibilidad
-    public function exportExcel()
+    public function exportExcel(ExcelExportService $exportService)
     {
-        // Temporalmente deshabilitado debido a problemas de compatibilidad
-        return response()->json(['error' => 'Exportación de Excel temporalmente deshabilitada'], 503);
-        // return $this->exportPizzasExcel();
+        return $this->exportPizzasExcel($exportService);
     }
 
     public function exportPdf()
