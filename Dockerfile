@@ -4,6 +4,7 @@ FROM php:8.2-apache
 # Establecer variables de entorno
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 ENV APACHE_LOG_DIR=/var/log/apache2
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
@@ -38,6 +39,9 @@ RUN docker-php-ext-install \
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Configurar Composer para evitar warnings
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer config --global allow-plugins.php-http/discovery false
+
 # Configurar Apache
 RUN a2enmod rewrite headers expires
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
@@ -52,17 +56,23 @@ WORKDIR /var/www/html
 # Copiar composer.json y composer.lock primero (para cache de capas)
 COPY composer.json composer.lock ./
 
-# Instalar dependencias PHP
-RUN composer install --no-dev --no-scripts --no-autoloader
-
 # Copiar package.json y package-lock.json
 COPY package*.json ./
 
 # Copiar el resto de archivos del proyecto
 COPY . .
 
-# Finalizar instalación de Composer
-RUN composer dump-autoload --no-dev --optimize
+# Instalar dependencias PHP (sin scripts primero)
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --no-scripts
+
+# Usar archivo .env temporal para el build
+RUN cp .env.docker .env
+
+# Generar clave de aplicación
+RUN php artisan key:generate --force --no-interaction
+
+# Ejecutar dump-autoload
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --optimize --no-scripts
 
 # Instalar dependencias de Node.js y construir assets
 RUN npm install

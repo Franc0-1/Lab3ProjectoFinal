@@ -47,6 +47,8 @@ envVars:
 - ✅ Agregado Node.js para construir assets
 - ✅ Configurado Apache con módulos rewrite, headers, expires
 - ✅ Añadida configuración SSL personalizada
+- ✅ Solucionado problema de Composer con COMPOSER_ALLOW_SUPERUSER=1
+- ✅ Creado archivo .env.docker para el build
 
 #### AppServiceProvider
 - ✅ Configurado trusted proxies para producción
