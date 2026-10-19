@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Str;
 
 class AdminUserSeeder extends Seeder
 {
@@ -37,46 +38,36 @@ class AdminUserSeeder extends Seeder
         // Asignar todos los permisos al rol admin
         $adminRole->syncPermissions($permissions);
 
-        // Crear usuario administrador por defecto
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@laqueva.com'],
-            [
-                'name' => 'Administrador',
-                'password' => bcrypt('admin123'),
-                'email_verified_at' => now(),
-            ]
-        );
+        // Las contraseñas se leen de SEED_*_PASSWORD; si no están definidas se genera una aleatoria.
+        // Nunca se guardan en el código y solo se muestran al crear el usuario por primera vez.
+        $users = [
+            ['email' => 'admin@laqueva.com', 'name' => 'Administrador', 'role' => 'admin', 'env' => 'SEED_ADMIN_PASSWORD'],
+            ['email' => 'empleado@laqueva.com', 'name' => 'Empleado', 'role' => 'employee', 'env' => 'SEED_EMPLOYEE_PASSWORD'],
+            ['email' => 'cliente@laqueva.com', 'name' => 'Cliente', 'role' => 'customer', 'env' => 'SEED_CUSTOMER_PASSWORD'],
+        ];
 
-        // Asignar rol de administrador
-        $admin->assignRole('admin');
+        foreach ($users as $data) {
+            $configured = env($data['env']);
+            $password = $configured ?: Str::password(16, symbols: false);
 
-        // Crear usuario empleado de ejemplo
-        $employee = User::firstOrCreate(
-            ['email' => 'empleado@laqueva.com'],
-            [
-                'name' => 'Empleado',
-                'password' => bcrypt('empleado123'),
-                'email_verified_at' => now(),
-            ]
-        );
+            $user = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'name' => $data['name'],
+                    'password' => bcrypt($password),
+                    'email_verified_at' => now(),
+                ]
+            );
 
-        $employee->assignRole('employee');
+            $user->assignRole($data['role']);
 
-        // Crear usuario cliente de ejemplo
-        $customer = User::firstOrCreate(
-            ['email' => 'cliente@laqueva.com'],
-            [
-                'name' => 'Cliente',
-                'password' => bcrypt('cliente123'),
-                'email_verified_at' => now(),
-            ]
-        );
-
-        $customer->assignRole('customer');
-
-        $this->command->info('Usuarios creados exitosamente:');
-        $this->command->info('Admin: admin@laqueva.com / admin123');
-        $this->command->info('Empleado: empleado@laqueva.com / empleado123');
-        $this->command->info('Cliente: cliente@laqueva.com / cliente123');
+            if (!$user->wasRecentlyCreated) {
+                $this->command->info("{$data['email']} ya existía: no se modificó su contraseña.");
+            } elseif ($configured) {
+                $this->command->info("{$data['email']} creado con la contraseña de {$data['env']}.");
+            } else {
+                $this->command->warn("{$data['email']} creado. Contraseña generada (se muestra una sola vez): {$password}");
+            }
+        }
     }
 }

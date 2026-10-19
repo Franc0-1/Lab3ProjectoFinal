@@ -53,17 +53,20 @@ Este comando ejecuta:
 
 ### 3. Credenciales de Acceso
 
-**Administrador:**
-- Email: `admin@laqueva.com`
-- Contraseña: `admin123`
+El seeder crea tres usuarios: `admin@laqueva.com` (administrador), `empleado@laqueva.com` (empleado) y `cliente@laqueva.com` (cliente).
 
-**Empleado:**
-- Email: `empleado@laqueva.com`
-- Contraseña: `empleado123`
+Las contraseñas no están en el código:
 
-**Cliente:**
-- Email: `cliente@laqueva.com`
-- Contraseña: `cliente123`
+- Definí `SEED_ADMIN_PASSWORD`, `SEED_EMPLOYEE_PASSWORD` y `SEED_CUSTOMER_PASSWORD` en `.env` antes de ejecutar `php artisan admin:setup`, o
+- dejalas vacías: el seeder genera una contraseña aleatoria para cada usuario nuevo y la muestra **una sola vez** en la consola.
+
+Para cambiar la contraseña del administrador más adelante:
+
+```bash
+php artisan admin:reset-password
+```
+
+El comando la pide de forma oculta y no la muestra.
 
 ## Acceso al Sistema
 

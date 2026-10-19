@@ -34,7 +34,8 @@ class SetupAdminCommand extends Command
 
         // Ejecutar seeders
         $this->info('🌱 Ejecutando seeders...');
-        Artisan::call('db:seed', ['--class' => 'AdminUserSeeder']);
+        // $this->call muestra la salida del seeder, que incluye las contraseñas generadas.
+        $this->call('db:seed', ['--class' => 'AdminUserSeeder', '--force' => true]);
 
         // Limpiar cache
         $this->info('🧹 Limpiando caché...');
@@ -48,10 +49,9 @@ class SetupAdminCommand extends Command
 
         $this->info('✅ Sistema de administración configurado exitosamente!');
         $this->info('');
-        $this->info('🔑 Credenciales de acceso:');
-        $this->info('Admin: admin@laqueva.com / admin123');
-        $this->info('Empleado: empleado@laqueva.com / empleado123');
-        $this->info('Cliente: cliente@laqueva.com / cliente123');
+        $this->info('🔑 Usuarios: admin@laqueva.com, empleado@laqueva.com y cliente@laqueva.com.');
+        $this->info('Las contraseñas son las de SEED_*_PASSWORD en .env o las generadas que se mostraron arriba.');
+        $this->info('Para cambiar la del administrador: php artisan admin:reset-password');
         $this->info('');
         $this->info('🌐 Accede al panel de administración en: /admin/dashboard');
         $this->info('');
